@@ -12,17 +12,23 @@ func height(pos):
 func _ready():
 	groundMat = load("res://assets/shaders/TerrainMaterial.tres")
 	groundMat.set_shader_param("heightmap", planet.heightmap)
+	groundMat.set_shader_param("mapColor", planet.mapColor)
 	groundMat.set_shader_param("world_pos", global.basePosition / global.size)
 	groundMat.set_shader_param("scene_size", global.baseSize / global.size)
 
-	set_process(false)
-	#var width = 15
-	#var length = 15
-	#for i in range(-5, 5):
-		#for j in range(-10, 0):
-			#var res = 10.0
-			#add_plane(i*width, j*length, width, length, res)
-	add_plane(-100, -100, 200, 200, 100)
+#	add a low resolution skirt around the whole thing to be used for a fog or
+#	glitch effect to show that the scanner has gone too far
+	add_plane(-100, -100, 0.0, 200, 200, 100)
+	#low res background
+	add_plane(-300, -300, -1.0, 200, 200, 20)
+	add_plane(-100, -300, -1.0, 200, 200, 20)
+	add_plane(100, -300, -1.0, 200, 200, 20)
+	add_plane(-300, -100, -1.0, 200, 200, 20)
+	add_plane(100, -100, -1.0, 200, 200, 20)
+	add_plane(-300, 100, -1.0, 200, 200, 20)
+	add_plane(-100, 100, -1.0, 200, 200, 20)
+	add_plane(100, 100, -1.0, 200, 200, 20)
+	
 
 func crand(pos, m):
 	var offset = Vector2()
@@ -30,19 +36,18 @@ func crand(pos, m):
 	offset.y = (float(p[(int(pos.x)+p[int(pos.y)%256])%256])/256.0)*1.0-0.5
 	return pos+offset*m*Vector2(roughness, roughness)
 
-func add_plane(x, z, w, l, res):
+func add_plane(x, z, y, w, l, res):
 	var st = SurfaceTool.new()
 	st.set_material(groundMat)
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var wr = w/res
 	var lr = l/res
 	var num = 0
-
 	for i in range(res+1):
 		for j in range(res+1):
 			var pos = crand(Vector2(i*wr+x, j*lr+z), wr)
-			var h = height(pos)
-			h += (float(p[(int(pos.x*2.0)+p[int(pos.y*4)%256])%256])/256.0)*roughness
+			var h = 0.0#height(pos)
+			#h += (float(p[(int(pos.x*2.0)+p[int(pos.y*4)%256])%256])/256.0)*roughness
 			st.add_vertex(Vector3(pos.x-x, h, pos.y-z))
 			num+=1
 			if i>0 && j>0:
@@ -61,7 +66,7 @@ func add_plane(x, z, w, l, res):
 	var mesh = st.commit()
 	var chunk = MeshInstance.new()
 	chunk.set_mesh(st.commit())
-	chunk.set_translation(Vector3(x, 0, z))
+	chunk.set_translation(Vector3(x, y, z))
 	chunk.material_override = groundMat
 	add_child(chunk)
 	

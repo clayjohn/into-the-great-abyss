@@ -1,0 +1,41 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+
+code = "shader_type spatial;
+render_mode blend_add, depth_draw_always,cull_back,diffuse_burley,specular_schlick_ggx, skip_vertex_transform;
+
+uniform sampler2D heightmap;
+uniform vec2 world_pos;
+uniform vec2 scene_size;
+
+void vertex() {
+	vec3 cam = CAMERA_MATRIX[3].xyz + vec3(100.0);
+	float cam_height = textureLod(heightmap, world_pos + scene_size*(cam.xz / 200.0), 1.0).x;
+	vec3 pos = (WORLD_MATRIX[3].xyz+vec3(100.0))/200.0;
+	float height = texture(heightmap, world_pos + scene_size*(pos.xz)).x ;
+	VERTEX.y += (-5.0 + height*20.0) / WORLD_MATRIX[1].y;
+	VERTEX.y -= (-5.0 + cam_height*20.0) / WORLD_MATRIX[1].y;
+	VERTEX = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	NORMAL = (MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz;
+	
+}
+
+void fragment(){
+	ALBEDO = vec3(0.0);
+	ALPHA = 1.0;
+}
+void light(){
+	DIFFUSE_LIGHT = vec3(pow(1.0-max(dot(NORMAL, VIEW), 0.0), 2.0));
+}
+"
+_sections_unfolded = [ "Resource" ]
+
+[resource]
+
+render_priority = 0
+shader = SubResource( 1 )
+shader_param/world_pos = null
+shader_param/scene_size = null
+_sections_unfolded = [ "shader_param" ]
+

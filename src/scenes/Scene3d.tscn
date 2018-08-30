@@ -17,8 +17,8 @@ fog_color = Color( 0.654902, 0.831373, 0.894118, 1 )
 fog_sun_color = Color( 1, 0.9, 0.7, 1 )
 fog_sun_amount = 0.2
 fog_depth_enabled = true
-fog_depth_begin = 10.0
-fog_depth_curve = 0.5
+fog_depth_begin = 3.0
+fog_depth_curve = 0.225313
 fog_transmit_enabled = false
 fog_transmit_curve = 1.0
 fog_height_enabled = false
@@ -81,7 +81,7 @@ adjustment_contrast = 1.0
 adjustment_saturation = 1.0
 _sections_unfolded = [ "Ambient Light", "Background", "Fog", "Tonemap" ]
 
-[node name="Spatial" type="Spatial"]
+[node name="Spatial" type="Spatial" index="0"]
 
 script = ExtResource( 1 )
 
@@ -119,6 +119,7 @@ environment = SubResource( 1 )
 
 [node name="Camera" type="Camera" parent="." index="2"]
 
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
 keep_aspect = 1
 cull_mask = 1048575
 environment = null

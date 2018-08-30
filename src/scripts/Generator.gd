@@ -73,8 +73,10 @@ func _ready():
 	##acquire references to internal texture of all viewports in order
 	##to be accessed from other parts of the generator and scene
 	mapHeight = $Pass1.get_texture()
+	mapHeight.flags = 7 #enable filter, repeat, and mipmaps
 	mapNormal = $Pass2.get_texture()
 	mapTexture = $Pass3.get_texture()
+	mapTexture.flags = 7
 	cloudHeight = $Pass4.get_texture()
 	cloudNormal = $Pass5.get_texture()
 	cloudTexture = $Pass6.get_texture()
@@ -89,6 +91,7 @@ func _ready():
 	
 	#Pass the heightmap to the planet information node
 	planet.heightmap = mapHeight
+	planet.mapColor = mapTexture
 	
 	#pass textures to other viewports to use them as input
 	$Pass2/MapNormal.material.set_shader_param("heightmap", mapHeight)
